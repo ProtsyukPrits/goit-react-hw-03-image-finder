@@ -83,7 +83,7 @@ export class App extends Component {
 
         {<Searchbar onSubmit={this.handleSubmit} />}
 
-        {!isLoading && materials.length === 0 && (
+        { materials.length === 0 && (
           <p>Nothing found, enter something in the search</p>
         )}
 
