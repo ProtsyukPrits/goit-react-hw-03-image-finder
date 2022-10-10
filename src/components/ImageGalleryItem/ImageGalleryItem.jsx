@@ -11,8 +11,10 @@ export const ImageGalleryItem = ({ material: { webformatURL, user, id}, onClick}
 };
 
 ImageGalleryItem.propTypes = {
-  materials: PropTypes.shape({
+  material: PropTypes.shape({
     webformatURL: PropTypes.string.isRequired,
     user: PropTypes.string.isRequired,
-  })
+    id: PropTypes.number.isRequired,
+  }),
+  onClick: PropTypes.func.isRequired,
 }

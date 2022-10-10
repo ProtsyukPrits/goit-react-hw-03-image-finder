@@ -1,5 +1,6 @@
 import { Header, FormItem, SearchButton, Input } from './Searchbar.styled';
-import { BsSearch } from 'react-icons/bs';
+import { BsSearch } from 'react-icons/bs' 
+import { PropTypes } from 'prop-types';
 
 export const Searchbar = ({ onSubmit }) => {
   return (
@@ -12,11 +13,13 @@ export const Searchbar = ({ onSubmit }) => {
         />
 
         <SearchButton type="submit">
-          <BsSearch size={24} />
+          <BsSearch size={15}/>
         </SearchButton>
       </FormItem>
     </Header>
   );
 };
 
-// autofocus ===input?
+Searchbar.propTypes = {
+  onSubmit: PropTypes.func.isRequired,
+}

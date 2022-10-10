@@ -8,7 +8,6 @@ import { Button } from './Button';
 import { Modal } from './Modal';
 import { Loader } from './Loader';
 
-
 export class App extends Component {
   state = {
     materials: [],
@@ -18,7 +17,6 @@ export class App extends Component {
     query: '',
     page: 1,
     photoIsActive: null,
-    status: ''
   };
 
   async componentDidUpdate(_, prevState) {
@@ -26,10 +24,11 @@ export class App extends Component {
 
     try {
       if (prevState.page !== page || prevState.query !== query) {
-        this.setState({ });
-        const material = await addBaseFetch(query, page);
+        this.setState({ isLoading: true });
+        const dataFetch = await addBaseFetch(query, page);
         this.setState(prevState => ({
-          materials: [...prevState.materials, ...material],
+          materials: [...prevState.materials, ...dataFetch],
+          isLoading: false,
         }));
       }
     } catch (error) {
@@ -48,13 +47,10 @@ export class App extends Component {
   };
 
   handleLoadMore = () => {
-    this.setState({  });
     this.setState(prevState => ({
       page: prevState.page + 1,
-      
     }));
   };
-
 
   openModal = e => {
     const imageId = Number(e.currentTarget.id);
@@ -65,7 +61,6 @@ export class App extends Component {
       photoIsActive,
       showModal: true,
     });
-    console.log('imageId',imageId)
   };
 
   closeModal = () => {
@@ -73,26 +68,35 @@ export class App extends Component {
   };
 
   render() {
-    const { materials, error, page, showModal, photoIsActive, status } = this.state;
-    
+    const { materials, error, showModal, photoIsActive, isLoading } =
+      this.state;
 
     return (
       <Container>
         {showModal && (
           <Modal onClose={this.closeModal}>
+            {/* Я вирішив зробити модалку як універсальнна обгортка,
+             а в середині рендерити контент який потрібно. */}
             <img src={photoIsActive.largeImageURL} alt={photoIsActive.tags} />
           </Modal>
         )}
-        <Searchbar onSubmit={this.handleSubmit} />
 
+        {<Searchbar onSubmit={this.handleSubmit} />}
 
-        {error && <p>Wooops some errors!!! - {error.message}</p>}
+        {!isLoading && materials.length === 0 && (
+          <p>Nothing found, enter something in the search</p>
+        )}
+
+        {error && <p>Wooops some errors!!!</p>}
         {materials.length > 0 && (
           <ImageGallery materials={materials} onClick={this.openModal} />
         )}
-        {status === 'pending' && <Loader></Loader>}
-        {page < materials.length  &&
-        <Button loadMore={this.handleLoadMore} />}
+
+        {isLoading && <Loader />}
+
+        {materials.length > 0 && (
+          <Button loadMore={this.handleLoadMore} isLoading={isLoading} />
+        )}
       </Container>
     );
   }

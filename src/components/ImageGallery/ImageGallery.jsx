@@ -13,7 +13,8 @@ export const ImageGallery = ({ materials, onClick }) => {
 };
 
 
-// ImageGallery.propTypes = {
-//   article: PropTypes.arrayOf(PropTypes.string).isRequired,
-//   key: PropTypes.number.isRequired,
-// }
+ImageGallery.propTypes = {
+  material: PropTypes.arrayOf(PropTypes.string).isRequired,
+  key: PropTypes.number.isRequired,
+  onClick: PropTypes.func.isRequired,
+}
