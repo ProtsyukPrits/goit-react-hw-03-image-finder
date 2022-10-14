@@ -7,6 +7,9 @@ import { Container } from './Common.styled';
 import { Button } from './Button';
 import { Modal } from './Modal';
 import { Loader } from './Loader';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { Loading } from 'notiflix';
 
 export class App extends Component {
   state = {
@@ -17,17 +20,18 @@ export class App extends Component {
     query: '',
     page: 1,
     photoIsActive: null,
+    perPage: 12,
+    totalPages: null,
   };
 
   async componentDidUpdate(_, prevState) {
-    const { query, page } = this.state;
-
+    const { query, page, perPage } = this.state;
     try {
       if (prevState.page !== page || prevState.query !== query) {
         this.setState({ isLoading: true });
-        const dataFetch = await addBaseFetch(query, page);
+        const dataFetch = await addBaseFetch(query, page, perPage);
         this.setState(prevState => ({
-          materials: [...prevState.materials, ...dataFetch],
+          materials: [...prevState.materials, ...dataFetch.hits],
           isLoading: false,
         }));
       }
@@ -38,15 +42,28 @@ export class App extends Component {
 
   handleSubmit = e => {
     e.preventDefault();
+
+    if (this.state.query.trim() === '') {
+      toast.error('Nothing found, enter something in the search');
+    }
+
     this.setState({
       page: 1,
       query: e.target.elements.query.value,
       materials: [],
+      totalPages: null,
     });
     e.target.reset();
   };
 
-  handleLoadMore = () => {
+  handleLoadMore = async e => {
+    const { query, perPage } = this.state;
+    //
+    const loadMoreDataFetch = await addBaseFetch(query);
+    const totalPages = Math.ceil(loadMoreDataFetch.total / perPage);
+    this.setState({ totalPages: totalPages });
+    // ------
+
     this.setState(prevState => ({
       page: prevState.page + 1,
     }));
@@ -68,8 +85,16 @@ export class App extends Component {
   };
 
   render() {
-    const { materials, error, showModal, photoIsActive, isLoading } =
-      this.state;
+    const {
+      query,
+      materials,
+      page,
+      totalPages,
+      error,
+      showModal,
+      photoIsActive,
+      isLoading,
+    } = this.state;
 
     return (
       <Container>
@@ -80,23 +105,25 @@ export class App extends Component {
             <img src={photoIsActive.largeImageURL} alt={photoIsActive.tags} />
           </Modal>
         )}
-
-        {<Searchbar onSubmit={this.handleSubmit} />}
-
-        { materials.length === 0 && (
-          <p>Nothing found, enter something in the search</p>
-        )}
-
+        {/* Input */}
+        <Searchbar onSubmit={this.handleSubmit} />
+        {materials.length === 0 && !isLoading && <p>Please, enter something in the search</p>}
+        {/*Toast  */}
+        {query === '' && <ToastContainer />}
+        {/* Gallery */}
         {error && <p>Wooops some errors!!!</p>}
         {materials.length > 0 && (
           <ImageGallery materials={materials} onClick={this.openModal} />
         )}
-
+        {/* Loader */}
         {isLoading && <Loader />}
 
-        {materials.length > 0 && (
-          <Button loadMore={this.handleLoadMore} isLoading={isLoading} />
-        )}
+        {/* LoadMoreBTN */}
+        {page === totalPages
+          ? !isLoading && <p>End of content</p>
+          : materials.length > 0 && (
+              <Button loadMore={this.handleLoadMore} isLoading={isLoading} />
+            )}
       </Container>
     );
   }

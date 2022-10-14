@@ -14,7 +14,8 @@ export const ImageGallery = ({ materials, onClick }) => {
 
 
 ImageGallery.propTypes = {
-  material: PropTypes.arrayOf(PropTypes.string).isRequired,
-  key: PropTypes.number.isRequired,
+  material: PropTypes.shape({
+    id : PropTypes.number.isRequired,
+  }),
   onClick: PropTypes.func.isRequired,
-}
+};
