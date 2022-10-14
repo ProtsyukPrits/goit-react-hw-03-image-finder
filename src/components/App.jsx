@@ -9,7 +9,6 @@ import { Modal } from './Modal';
 import { Loader } from './Loader';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Loading } from 'notiflix';
 
 export class App extends Component {
   state = {
